@@ -11,8 +11,9 @@ ARM Macro Assembler    Page 1
     5 00000004 E3A01011        MOV              r1,#17
     6 00000008         
     7 00000008 E0020190        MUL              r2,r0,r1
-    8 0000000C         
-    9 0000000C                 END
+    8 0000000C E0030091        MUL              r3,r1,r0
+    9 00000010         
+   10 00000010                 END
 Command Line: --debug --xref --diag_suppress=9931 --cpu=ARM9E --apcs=interwork 
 --depend=.\objects\weeky_03.d -o.\objects\weeky_03.o -IC:\Keil_v5\ARM\RV31\INC 
 --predefine="__EVAL SETA 1" --predefine="__UVISION_VERSION SETA 538" --list=.\l

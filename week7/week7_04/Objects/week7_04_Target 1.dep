@@ -1,3 +1,3 @@
 Dependencies for Project 'week7_04', Target 'Target 1': (DO NOT MODIFY !)
 CompilerVersion: 5060750::V5.06 update 6 (build 750)::ARMCC
-F (.\week7_04.s)(0x653E115B)(--cpu ARM9E --pd "__EVAL SETA 1" -g --apcs=interwork -IC:\Keil_v5\ARM\RV31\INC--pd "__UVISION_VERSION SETA 538"--list .\listings\week7_04.lst --xref -o .\objects\week7_04.o --depend .\objects\week7_04.d)
+F (.\week7_04.s)(0x653E29E1)(--cpu ARM9E --pd "__EVAL SETA 1" -g --apcs=interwork -IC:\Keil_v5\ARM\RV31\INC--pd "__UVISION_VERSION SETA 538"--list .\listings\week7_04.lst --xref -o .\objects\week7_04.o --depend .\objects\week7_04.d)

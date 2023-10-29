@@ -5,5 +5,6 @@ start
 	MOV r1,#17
 	
 	MUL r2,r0,r1
+	MUL r3,r1,r0
 
 	END

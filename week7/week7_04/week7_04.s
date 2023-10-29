@@ -58,12 +58,12 @@ float_addition
 	;get mantissa
 	
 	CMP r3,r6
-	ADDGE r5,r3,r8
-	ADDLT r5,r6,r8
-	MOV r6,r2,LSL#8
-	ADD r5,r5,r2
-	MOV r5,r5,LSL#23
-	ADD r5,r5,r9
+	ADDGE r10,r3,r8
+	ADDLT r10,r6,r8
+	MOV r2,r2,LSL#8
+	ADD r11,r10,r2
+	MOV r11,r11,LSL#23
+	ADD r11,r11,r9
 	
 	B str_state
 
@@ -96,20 +96,20 @@ float_subtraction
 	;get mantissa
 	
 	CMP r4,r7
-	MOVGT r5,r2,LSL#8
-	MOVLT r5,r5,LSL#8
+	MOVGT r2,r2,LSL#8
+	MOVLE r2,r5,LSL#8
 	CMP r3,r6
-	ADDGT r2,r3,r8
-	ADDLE r2,r6,r8
-	ADD r5,r5,r2
-	MOV r5,r5,LSL#23
-	ADD r5,r5,r9
+	ADDGT r3,r3,r8
+	ADDLE r3,r6,r8
+	ADD r10,r3,r2
+	MOV r11,r10,LSL#23
+	ADD r11,r11,r9
 	
 	B str_state
 	
 str_state
 	LDR r0,TEMPADDR
-	STR r5,[r0]
+	STR r11,[r0]
 	MOV pc,lr
 	
 	

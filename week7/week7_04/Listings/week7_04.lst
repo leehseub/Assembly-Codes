@@ -40,105 +40,114 @@ ARM Macro Assembler    Page 1
    34 00000044         
    35 00000044         float_addition
    36 00000044 E1530006        CMP              r3,r6
-   37 00000048 B0468003        SUBLT            r8,r6,r3
-   38 0000004C C0438006        SUBGT            r8,r3,r6
-   39 00000050 B1A04834        MOVLT            r4,r4,LSR r8
-   40 00000054 C1A07837        MOVGT            r7,r7,LSR r8
-   41 00000058         
-   42 00000058 E0849007        ADD              r9,r4,r7
-   43 0000005C E1A0ABA9        MOV              r10,r9,LSR#23
-   44 00000060         
-   45 00000060 E35A0001        CMP              r10,#1
-   46 00000064         
-   47 00000064 C2888001        ADDGT            r8,r8,#1
-   48 00000068 C1A090A9        MOVGT            r9,r9,LSR#1
-   49 0000006C         
-   50 0000006C B2488001        SUBLT            r8,r8,#1
-   51 00000070 B1A09089        MOVLT            r9,r9,LSL#1
-   52 00000074         
-   53 00000074 E2499502        SUB              r9,r9,#0x00800000
-   54 00000078         
-   55 00000078 E1530006        CMP              r3,r6
-   56 0000007C A0835008        ADDGE            r5,r3,r8
-   57 00000080 B0865008        ADDLT            r5,r6,r8
-   58 00000084 E1A06402        MOV              r6,r2,LSL#8
-   59 00000088 E0855002        ADD              r5,r5,r2
+   37 00000048         ;compare exponent
+   38 00000048 B0468003        SUBLT            r8,r6,r3
+   39 0000004C C0438006        SUBGT            r8,r3,r6
+   40 00000050 B1A04834        MOVLT            r4,r4,LSR r8
+   41 00000054 C1A07837        MOVGT            r7,r7,LSR r8
+   42 00000058         
+   43 00000058 E0849007        ADD              r9,r4,r7
+   44 0000005C E1A0ABA9        MOV              r10,r9,LSR#23
+   45 00000060         
+   46 00000060 E35A0001        CMP              r10,#1
+   47 00000064         ;Check left side of dot is 1
+   48 00000064         
+   49 00000064 C2888001        ADDGT            r8,r8,#1
+   50 00000068 C1A090A9        MOVGT            r9,r9,LSR#1
+   51 0000006C         ;if greater than 1, Shift Right 1 bit
+   52 0000006C         
+   53 0000006C B2488001        SUBLT            r8,r8,#1
+   54 00000070 B1A09089        MOVLT            r9,r9,LSL#1
+   55 00000074         ;if lower than 1, Shift Left 1 bit
+   56 00000074         
+   57 00000074 E2499502        SUB              r9,r9,#0x00800000
+   58 00000078         ;get mantissa
+   59 00000078         
 
 
 
 ARM Macro Assembler    Page 2 
 
 
-   60 0000008C E1A05B85        MOV              r5,r5,LSL#23
-   61 00000090 E0855009        ADD              r5,r5,r9
-   62 00000094         
-   63 00000094 EA000018        B                str_state
-   64 00000098         
-   65 00000098         float_subtraction
-   66 00000098 E1530006        CMP              r3,r6
-   67 0000009C B0468003        SUBLT            r8,r6,r3
-   68 000000A0 C0438006        SUBGT            r8,r3,r6
-   69 000000A4 B1A04834        MOVLT            r4,r4,LSR r8
-   70 000000A8 C1A07837        MOVGT            r7,r7,LSR r8
-   71 000000AC         
-   72 000000AC E1540007        CMP              r4,r7
-   73 000000B0 B0479004        SUBLT            r9,r7,r4
-   74 000000B4 C0449007        SUBGT            r9,r4,r7
-   75 000000B8         
-   76 000000B8 E1A0ABA9        MOV              r10,r9,LSR#23
-   77 000000BC         
-   78 000000BC E35A0001        CMP              r10,#1
-   79 000000C0         
-   80 000000C0 C2888001        ADDGT            r8,r8,#1
-   81 000000C4 C1A090A9        MOVGT            r9,r9,LSR#1
-   82 000000C8         
-   83 000000C8 B2488001        SUBLT            r8,r8,#1
-   84 000000CC B1A09089        MOVLT            r9,r9,LSL#1
-   85 000000D0         
-   86 000000D0 E2499502        SUB              r9,r9,#0x00800000
-   87 000000D4         
-   88 000000D4         
-   89 000000D4 E1540007        CMP              r4,r7
-   90 000000D8 C1A05402        MOVGT            r5,r2,LSL#8
-   91 000000DC B1A05405        MOVLT            r5,r5,LSL#8
-   92 000000E0 E1530006        CMP              r3,r6
-   93 000000E4 C0832008        ADDGT            r2,r3,r8
-   94 000000E8 D0862008        ADDLE            r2,r6,r8
-   95 000000EC E0855002        ADD              r5,r5,r2
-   96 000000F0 E1A05B85        MOV              r5,r5,LSL#23
-   97 000000F4 E0855009        ADD              r5,r5,r9
-   98 000000F8         
-   99 000000F8 EAFFFFFF        B                str_state
-  100 000000FC         
-  101 000000FC         str_state
-  102 000000FC E59F000C        LDR              r0,TEMPADDR
-  103 00000100 E5805000        STR              r5,[r0]
-  104 00000104 E1A0F00E        MOV              pc,lr
-  105 00000108         
-  106 00000108         
-  107 00000108 42680000 
+   60 00000078 E1530006        CMP              r3,r6
+   61 0000007C A083A008        ADDGE            r10,r3,r8
+   62 00000080 B086A008        ADDLT            r10,r6,r8
+   63 00000084 E1A02402        MOV              r2,r2,LSL#8
+   64 00000088 E08AB002        ADD              r11,r10,r2
+   65 0000008C E1A0BB8B        MOV              r11,r11,LSL#23
+   66 00000090 E08BB009        ADD              r11,r11,r9
+   67 00000094         
+   68 00000094 EA000018        B                str_state
+   69 00000098         
+   70 00000098         float_subtraction
+   71 00000098 E1530006        CMP              r3,r6
+   72 0000009C         ;compare exponent
+   73 0000009C B0468003        SUBLT            r8,r6,r3
+   74 000000A0 C0438006        SUBGT            r8,r3,r6
+   75 000000A4 B1A04834        MOVLT            r4,r4,LSR r8
+   76 000000A8 C1A07837        MOVGT            r7,r7,LSR r8
+   77 000000AC         
+   78 000000AC E1540007        CMP              r4,r7
+   79 000000B0 B0479004        SUBLT            r9,r7,r4
+   80 000000B4 C0449007        SUBGT            r9,r4,r7
+   81 000000B8         
+   82 000000B8 E1A0ABA9        MOV              r10,r9,LSR#23
+   83 000000BC         
+   84 000000BC E35A0001        CMP              r10,#1
+   85 000000C0         ;Check left side of dot is 1
+   86 000000C0         
+   87 000000C0 C2888001        ADDGT            r8,r8,#1
+   88 000000C4 C1A090A9        MOVGT            r9,r9,LSR#1
+   89 000000C8         ;if greater than 1, Shift Right 1 bit
+   90 000000C8         
+   91 000000C8 B2488001        SUBLT            r8,r8,#1
+   92 000000CC B1A09089        MOVLT            r9,r9,LSL#1
+   93 000000D0         ;if lower than 1, Shift Left 1 bit
+   94 000000D0         
+   95 000000D0 E2499502        SUB              r9,r9,#0x00800000
+   96 000000D4         ;get mantissa
+   97 000000D4         
+   98 000000D4 E1540007        CMP              r4,r7
+   99 000000D8 C1A02402        MOVGT            r2,r2,LSL#8
+  100 000000DC D1A02405        MOVLE            r2,r5,LSL#8
+  101 000000E0 E1530006        CMP              r3,r6
+  102 000000E4 C0833008        ADDGT            r3,r3,r8
+  103 000000E8 D0863008        ADDLE            r3,r6,r8
+  104 000000EC E083A002        ADD              r10,r3,r2
+  105 000000F0 E1A0BB8A        MOV              r11,r10,LSL#23
+  106 000000F4 E08BB009        ADD              r11,r11,r9
+  107 000000F8         
+  108 000000F8 EAFFFFFF        B                str_state
+  109 000000FC         
+  110 000000FC         str_state
+  111 000000FC E59F000C        LDR              r0,TEMPADDR
+  112 00000100 E580B000        STR              r11,[r0]
+  113 00000104 E1A0F00E        MOV              pc,lr
+  114 00000108         
+  115 00000108         
+  116 00000108 42680000 
                        floating_point01
                                &                0x42680000  ; 58(DEC) = 3A(HEX)
-                                                            
-  108 0000010C         ;floating_point01 & 0xC2680000 ; -58(DEC) = FFFF FFFF FF
-                       FF FFC6(HEX)
-  109 0000010C         ;floating_point02 & 0x42280000 ; 42(DEC) = 2A(HEX)
-  110 0000010C C2280000 
-                       floating_point02
-                               &                0xC2280000  ; -42(DEC) = FFFF F
-                                                            FFF FFFF FFD6(HEX)
-  111 00000110         
 
 
 
 ARM Macro Assembler    Page 3 
 
 
-  112 00000110 40000000 
+                                                            
+  117 0000010C         ;floating_point01 & 0xC2680000 ; -58(DEC) = FFFF FFFF FF
+                       FF FFC6(HEX)
+  118 0000010C         ;floating_point02 & 0x42280000 ; 42(DEC) = 2A(HEX)
+  119 0000010C C2280000 
+                       floating_point02
+                               &                0xC2280000  ; -42(DEC) = FFFF F
+                                                            FFF FFFF FFD6(HEX)
+  120 00000110         
+  121 00000110 40000000 
                        TEMPADDR
                                &                &40000000
-  113 00000114         
-  114 00000114                 END
+  122 00000114         
+  123 00000114                 END
 Command Line: --debug --xref --diag_suppress=9931 --cpu=ARM9E --apcs=interwork 
 --depend=.\objects\week7_04.d -o.\objects\week7_04.o -IC:\Keil_v5\ARM\RV31\INC 
 --predefine="__EVAL SETA 1" --predefine="__UVISION_VERSION SETA 538" --list=.\l
@@ -161,9 +170,9 @@ TEMPADDR 00000110
 
 Symbol: TEMPADDR
    Definitions
-      At line 112 in file week7_04.s
+      At line 121 in file week7_04.s
    Uses
-      At line 102 in file week7_04.s
+      At line 111 in file week7_04.s
 Comment: TEMPADDR used once
 float_addition 00000044
 
@@ -177,7 +186,7 @@ float_subtraction 00000098
 
 Symbol: float_subtraction
    Definitions
-      At line 65 in file week7_04.s
+      At line 70 in file week7_04.s
    Uses
       At line 33 in file week7_04.s
 Comment: float_subtraction used once
@@ -185,7 +194,7 @@ floating_point01 00000108
 
 Symbol: floating_point01
    Definitions
-      At line 107 in file week7_04.s
+      At line 116 in file week7_04.s
    Uses
       At line 4 in file week7_04.s
 Comment: floating_point01 used once
@@ -193,7 +202,7 @@ floating_point02 0000010C
 
 Symbol: floating_point02
    Definitions
-      At line 110 in file week7_04.s
+      At line 119 in file week7_04.s
    Uses
       At line 5 in file week7_04.s
 Comment: floating_point02 used once
@@ -215,10 +224,10 @@ ARM Macro Assembler    Page 2 Alphabetic symbol ordering
 Relocatable symbols
 
    Definitions
-      At line 101 in file week7_04.s
+      At line 110 in file week7_04.s
    Uses
-      At line 63 in file week7_04.s
-      At line 99 in file week7_04.s
+      At line 68 in file week7_04.s
+      At line 108 in file week7_04.s
 
 8 symbols
 340 symbols in table
