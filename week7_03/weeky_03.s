@@ -1,0 +1,9 @@
+	AREA ARMex, CODE, READONLY
+	ENTRY
+start
+	MOV r0,#3
+	MOV r1,#17
+	
+	MUL r2,r0,r1
+
+	END

@@ -1,0 +1,43 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             ARMex, CODE, READONLY
+    2 00000000                 ENTRY
+    3 00000000         start
+    4 00000000 E3A00011        MOV              r0,#17
+    5 00000004 E3A01003        MOV              r1,#3
+    6 00000008         
+    7 00000008 E0020190        MUL              r2,r0,r1
+    8 0000000C         
+    9 0000000C                 END
+Command Line: --debug --xref --diag_suppress=9931 --cpu=ARM9E --apcs=interwork 
+--depend=.\objects\week7_03_02.d -o.\objects\week7_03_02.o -IC:\Keil_v5\ARM\RV3
+1\INC --predefine="__EVAL SETA 1" --predefine="__UVISION_VERSION SETA 538" --li
+st=.\listings\week7_03_02.lst week7_03_02.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+ARMex 00000000
+
+Symbol: ARMex
+   Definitions
+      At line 1 in file week7_03_02.s
+   Uses
+      None
+Comment: ARMex unused
+start 00000000
+
+Symbol: start
+   Definitions
+      At line 3 in file week7_03_02.s
+   Uses
+      None
+Comment: start unused
+2 symbols
+334 symbols in table
