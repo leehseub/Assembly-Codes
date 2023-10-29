@@ -34,6 +34,7 @@ start
 
 float_addition
 	CMP r3,r6
+	;compare exponent
 	SUBLT r8,r6,r3
 	SUBGT r8,r3,r6
 	MOVLT r4,r4,LSR r8
@@ -43,14 +44,18 @@ float_addition
 	MOV r10,r9,LSR#23
 	
 	CMP r10,#1
+	;Check left side of dot is 1
 	
 	ADDGT r8,r8,#1
 	MOVGT r9,r9,LSR#1
+	;if greater than 1, Shift Right 1 bit
 	
 	SUBLT r8,r8,#1
 	MOVLT r9,r9,LSL#1
+	;if lower than 1, Shift Left 1 bit
 
 	SUB r9,r9,#0x00800000
+	;get mantissa
 	
 	CMP r3,r6
 	ADDGE r5,r3,r8
@@ -64,6 +69,7 @@ float_addition
 
 float_subtraction
 	CMP r3,r6
+	;compare exponent
 	SUBLT r8,r6,r3
 	SUBGT r8,r3,r6
 	MOVLT r4,r4,LSR r8
@@ -76,15 +82,18 @@ float_subtraction
 	MOV r10,r9,LSR#23
 	
 	CMP r10,#1
+	;Check left side of dot is 1
 	
 	ADDGT r8,r8,#1
 	MOVGT r9,r9,LSR#1
+	;if greater than 1, Shift Right 1 bit
 	
 	SUBLT r8,r8,#1
 	MOVLT r9,r9,LSL#1
-
-	SUB r9,r9,#0x00800000
+	;if lower than 1, Shift Left 1 bit
 	
+	SUB r9,r9,#0x00800000
+	;get mantissa
 	
 	CMP r4,r7
 	MOVGT r5,r2,LSL#8
