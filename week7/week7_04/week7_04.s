@@ -28,6 +28,16 @@ start
 	ADD r7,r7,#0x00800000
 	; mantissa2
 	
+	CMP r3,#0
+	CMPEQ r4,#0x00800000
+	MOVEQ r11,r1
+	BEQ str_state
+	
+	CMP r6,#0
+	CMPEQ r7,#0x00800000
+	MOVEQ r11,r0
+	BEQ str_state
+	
 	CMP r2,r5
 	BEQ float_addition
 	BNE float_subtraction
@@ -110,13 +120,13 @@ float_subtraction
 str_state
 	LDR r0,TEMPADDR
 	STR r11,[r0]
-	MOV pc,lr
 	
-	
-floating_point01 & 0x42680000	; 58(DEC) = 3A(HEX)
-;floating_point01 & 0xC2680000	; -58(DEC) = FFFF FFFF FFFF FFC6(HEX)
+;floating_point01 & 0x00000000	; 0	
+;floating_point01 & 0x42680000	; 58(DEC) = 3A(HEX)
+floating_point01 & 0xC2680000	; -58(DEC) = FFFF FFFF FFFF FFC6(HEX)
 ;floating_point02 & 0x42280000	; 42(DEC) = 2A(HEX)
 floating_point02 & 0xC2280000	; -42(DEC) = FFFF FFFF FFFF FFD6(HEX)
+;floating_point02 & 0x00000000	; 0
 
 TEMPADDR	&	&40000000
 
