@@ -1,0 +1,153 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000 0000000D 
+                       CR      EQU              0x0D
+    2 00000000 00000020 
+                       SPC     EQU              0x20
+    3 00000000                 AREA             pseudo, CODE, READONLY
+    4 00000000                 ENTRY
+    5 00000000         Main
+    6 00000000 E59F002C        LDR              R0,=Arr1
+    7 00000004 E59F102C        LDR              R1,=Arr2
+    8 00000008         
+    9 00000008         copy_arr_wo_space
+   10 00000008 E4D02001        LDRB             R2,[R0],#1
+   11 0000000C E3520020        CMP              r2,#SPC
+   12 00000010 0AFFFFFC        BEQ              copy_arr_wo_space
+   13 00000014 E5C12000        STRB             R2,[R1]
+   14 00000018 E2811001        ADD              R1,R1,#1
+   15 0000001C E352000D        CMP              R2,#CR
+   16 00000020 0A000001        BEQ              Done
+   17 00000024 E2833001        ADD              R3,R3,#1
+   18 00000028 EAFFFFF6        BAL              copy_arr_wo_space
+   19 0000002C         
+   20 0000002C         Done
+   21 0000002C E54F3008        STRB             R3,K
+   22 00000030 E1A0F00E        MOV              pc,lr
+   23 00000034         
+   24 00000034 00000000 
+              00000000         AREA             dataArray, DATA
+   25 00000000         K
+   26 00000000 00              DCB              0
+   27 00000001         Arr1
+   28 00000001 48 65 6C 
+              6C 6F 2C 
+              20 57 6F 
+              72 6C 64 
+              0D               DCB              "Hello, World",CR
+   29 0000000E 00 00           ALIGN
+   30 00000010         Arr2
+   31 00000010 00              DCB              0
+   32 00000011                 END
+Command Line: --debug --xref --diag_suppress=9931 --cpu=ARM9E --apcs=interwork 
+--depend=.\objects\pseudo.d -o.\objects\pseudo.o -IC:\Keil_v5\ARM\RV31\INC -IC:
+\Keil_v5\ARM\CMSIS\Include --predefine="__EVAL SETA 1" --predefine="__UVISION_V
+ERSION SETA 529" --list=.\listings\pseudo.lst pseudo.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+Done 0000002C
+
+Symbol: Done
+   Definitions
+      At line 20 in file pseudo.s
+   Uses
+      At line 16 in file pseudo.s
+Comment: Done used once
+Main 00000000
+
+Symbol: Main
+   Definitions
+      At line 5 in file pseudo.s
+   Uses
+      None
+Comment: Main unused
+copy_arr_wo_space 00000008
+
+Symbol: copy_arr_wo_space
+   Definitions
+      At line 9 in file pseudo.s
+   Uses
+      At line 12 in file pseudo.s
+      At line 18 in file pseudo.s
+
+pseudo 00000000
+
+Symbol: pseudo
+   Definitions
+      At line 3 in file pseudo.s
+   Uses
+      None
+Comment: pseudo unused
+4 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+Arr1 00000001
+
+Symbol: Arr1
+   Definitions
+      At line 27 in file pseudo.s
+   Uses
+      At line 6 in file pseudo.s
+Comment: Arr1 used once
+Arr2 00000010
+
+Symbol: Arr2
+   Definitions
+      At line 30 in file pseudo.s
+   Uses
+      At line 7 in file pseudo.s
+Comment: Arr2 used once
+K 00000000
+
+Symbol: K
+   Definitions
+      At line 25 in file pseudo.s
+   Uses
+      At line 21 in file pseudo.s
+Comment: K used once
+dataArray 00000000
+
+Symbol: dataArray
+   Definitions
+      At line 24 in file pseudo.s
+   Uses
+      None
+Comment: dataArray unused
+4 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Absolute symbols
+
+CR 0000000D
+
+Symbol: CR
+   Definitions
+      At line 1 in file pseudo.s
+   Uses
+      At line 15 in file pseudo.s
+      At line 28 in file pseudo.s
+
+SPC 00000020
+
+Symbol: SPC
+   Definitions
+      At line 2 in file pseudo.s
+   Uses
+      At line 11 in file pseudo.s
+Comment: SPC used once
+2 symbols
+344 symbols in table
