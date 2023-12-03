@@ -1,0 +1,56 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             code_area, CODE, READONLY
+    2 00000000                 ENTRY
+    3 00000000         
+    4 00000000         start
+    5 00000000 E3A00001        MOV              r0, #1
+    6 00000004 E3A01002        MOV              r1, #2
+    7 00000008 E3A03003        MOV              r3, #3
+    8 0000000C         
+    9 0000000C E3500001        CMP              r0,#1
+   10 00000010 03510003        CMPEQ            r1,#3
+   11 00000014 03A03004        MOVEQ            r3,#4
+   12 00000018         
+   13 00000018         exit
+   14 00000018                 END
+Command Line: --debug --xref --diag_suppress=9931 --cpu=ARM9E --apcs=interwork 
+--depend=.\objects\test_cmp.d -o.\objects\test_cmp.o -IC:\Keil_v5\ARM\RV31\INC 
+-IC:\Keil_v5\ARM\CMSIS\Include --predefine="__EVAL SETA 1" --predefine="__UVISI
+ON_VERSION SETA 529" --list=.\listings\test_cmp.lst test_cmp.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+code_area 00000000
+
+Symbol: code_area
+   Definitions
+      At line 1 in file test_cmp.s
+   Uses
+      None
+Comment: code_area unused
+exit 00000018
+
+Symbol: exit
+   Definitions
+      At line 13 in file test_cmp.s
+   Uses
+      None
+Comment: exit unused
+start 00000000
+
+Symbol: start
+   Definitions
+      At line 4 in file test_cmp.s
+   Uses
+      None
+Comment: start unused
+3 symbols
+335 symbols in table

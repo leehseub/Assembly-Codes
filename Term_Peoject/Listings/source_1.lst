@@ -1,0 +1,449 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             code_area, CODE, READONLY
+    2 00000000                 ENTRY
+    3 00000000         
+    4 00000000 00000450 
+                       float_number_series
+                               EQU              0x0450
+    5 00000000 00018AEC 
+                       sorted_number_series
+                               EQU              0x00018AEC
+    6 00000000 00031190 
+                       final_result_series
+                               EQU              0x00031190
+    7 00000000         
+    8 00000000 0003D090 
+                       n_nums_series
+                               EQU              0x0003D090
+    9 00000000 000493E0 
+                       p_nums_series
+                               EQU              0x000493E0
+   10 00000000         
+   11 00000000         ;========== Do not change this area ===========
+   12 00000000         
+   13 00000000         initialization
+   14 00000000 E59F01C0        LDR              r0, =0xDEADBEEF ; seed for rand
+                                                            om number
+   15 00000004 E3A01E45        LDR              r1, =float_number_series
+   16 00000008 E59F21BC        LDR              r2, =10000  ; The number of ele
+                                                            ment in stored sere
+                                                            is
+   17 0000000C E59F31BC        LDR              r3, =0x0EACBA90 ; constant for 
+                                                            random number
+   18 00000010         
+   19 00000010         save_float_series
+   20 00000010 E3520000        CMP              r2, #0
+   21 00000014 0A00000F        BEQ              ms_init
+   22 00000018 EB000003        BL               random_float_number
+   23 0000001C E4810004        STR              r0, [r1], #4
+   24 00000020 E2422001        SUB              r2, r2, #1
+   25 00000024 E3A05000        MOV              r5, #0
+   26 00000028 EAFFFFF8        B                save_float_series
+   27 0000002C         
+   28 0000002C         random_float_number
+   29 0000002C E1A0500E        MOV              r5, LR
+   30 00000030 E0200003        EOR              r0, r0, r3
+   31 00000034 E0203163        EOR              r3, r0, r3, ROR #2
+   32 00000038 E1500001        CMP              r0, r1
+   33 0000003C AB000001        BLGE             shift_left
+   34 00000040 BB000002        BLLT             shift_right
+   35 00000044 E12FFF15        BX               r5
+   36 00000048         
+   37 00000048         shift_left
+   38 00000048 E1A00080        LSL              r0, r0, #1
+   39 0000004C E12FFF1E        BX               LR
+   40 00000050         
+   41 00000050         shift_right
+   42 00000050 E1A000A0        LSR              r0, r0, #1
+   43 00000054 E12FFF1E        BX               LR
+   44 00000058         
+   45 00000058         ;============================================
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+   46 00000058         
+   47 00000058         ;========== Start your code here ===========
+   48 00000058         
+   49 00000058         ms_init
+   50 00000058 E3A00E45        LDR              r0, =float_number_series
+   51 0000005C E59F1170        LDR              r1, =n_nums_series
+   52 00000060 E59F2170        LDR              r2, =p_nums_series
+   53 00000064 E59F3160        LDR              r3, =10000  ;count number of lo
+                                                            op
+   54 00000068 E3A04000        MOV              r4, #0      ;count number of po
+                                                            s
+   55 0000006C E3A05000        MOV              r5, #0      ;count number of ne
+                                                            g
+   56 00000070         
+   57 00000070 EAFFFFFF        B                ldr_ms      ;Excepting function
+                                                             of NaN
+   58 00000074         
+   59 00000074         ldr_ms
+   60 00000074 E3530000        CMP              r3,#0       ;check count of sto
+                                                            red numbers
+   61 00000078 03A02001        MOVEQ            r2, #1
+   62 0000007C 0A000008        BEQ              n_sort
+   63 00000080         
+   64 00000080 E4906004        LDR              r6,[r0], #4 ;LOAD 1 of Float nu
+                                                            mber to r2 register
+                                                            
+   65 00000084 E1A07FA6        MOV              r7, r6, LSR#31 ;r7 = sign bit
+   66 00000088         
+   67 00000088 E2433001        SUB              r3, r3, #1
+   68 0000008C         
+   69 0000008C E3570001        CMP              r7,#1
+   70 00000090 04816004        STREQ            r6,[r1],#4  ;if sign bit is 1, 
+                                                            store at m_nums_ser
+                                                            ies
+   71 00000094 02855001        ADDEQ            r5, r5, #1
+   72 00000098 14826004        STRNE            r6,[r2],#4  ;if sign bit is 0, 
+                                                            store at p_nums_ser
+                                                            ies
+   73 0000009C 12844001        ADDNE            r4, r4, #1
+   74 000000A0 EAFFFFF3        B                ldr_ms
+   75 000000A4         
+   76 000000A4         n_sort
+   77 000000A4 E1520005        CMP              r2, r5
+   78 000000A8 03A02001        MOVEQ            r2, #1
+   79 000000AC 0A000018        BEQ              p_sort
+   80 000000B0 E59F011C        LDR              r0, =n_nums_series
+   81 000000B4 E1A03102        MOV              r3, r2, LSL#2 ;r3 = r2 * 4
+   82 000000B8 E0800003        ADD              r0, r0, r3
+   83 000000BC EAFFFFFF        B                n_sort_loop
+   84 000000C0         
+   85 000000C0         n_sort_loop
+   86 000000C0 E5906000        LDR              r6, [r0]
+   87 000000C4 E1A08086        MOV              r8, r6, LSL#1
+   88 000000C8 E1A08C28        MOV              r8, r8, LSR#24
+   89 000000CC         
+   90 000000CC E1A09486        MOV              r9, r6, LSL#9
+   91 000000D0 E1A094A9        MOV              r9, r9, LSR#9
+   92 000000D4         
+   93 000000D4 E2400004        SUB              r0, r0, #4
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+   94 000000D8 E5907000        LDR              r7, [r0]
+   95 000000DC         
+   96 000000DC E1A0A087        MOV              r10, r7, LSL#1
+   97 000000E0 E1A0AC2A        MOV              r10, r10, LSR#24
+   98 000000E4         
+   99 000000E4 E1A0B487        MOV              r11, r7, LSL#9
+  100 000000E8 E1A0B4AB        MOV              r11, r11, LSR#9
+  101 000000EC         
+  102 000000EC E158000A        CMP              r8, r10
+  103 000000F0 C5806000        STRGT            r6, [r0]    ;if r8 > r10, swap 
+                                                            two nums
+  104 000000F4 C580A004        STRGT            r10, [r0,#4]
+  105 000000F8 CAFFFFF0        BGT              n_sort_loop
+  106 000000FC 0159000B        CMPEQ            r9, r11
+  107 00000100 C5806000        STRGT            r6, [r0]
+  108 00000104 C580A004        STRGT            r10, [r0,#4]
+  109 00000108 CAFFFFEC        BGT              n_sort_loop
+  110 0000010C         
+  111 0000010C E2822001        ADD              r2, r2, #1
+  112 00000110 EAFFFFE3        B                n_sort
+  113 00000114         
+  114 00000114         p_sort
+  115 00000114 E1520004        CMP              r2, r4
+  116 00000118 0A000018        BEQ              is_sort
+  117 0000011C E59F00B4        LDR              r0, =p_nums_series
+  118 00000120 E1A03102        MOV              r3, r2, LSL#2
+  119 00000124 E0800003        ADD              r0, r0, r3
+  120 00000128 EAFFFFFF        B                p_sort_loop
+  121 0000012C         
+  122 0000012C         p_sort_loop
+  123 0000012C E5906000        LDR              r6, [r0]
+  124 00000130 E1A08086        MOV              r8, r6, LSL#1
+  125 00000134 E1A08C28        MOV              r8, r8, LSR#24
+  126 00000138         
+  127 00000138 E1A09486        MOV              r9, r6, LSL#9
+  128 0000013C E1A094A9        MOV              r9, r9, LSR#9
+  129 00000140         
+  130 00000140 E2400004        SUB              r0, r0, #4
+  131 00000144 E5907000        LDR              r7, [r0]
+  132 00000148         
+  133 00000148 E1A0A087        MOV              r10, r7, LSL#1
+  134 0000014C E1A0AC2A        MOV              r10, r10, LSR#24
+  135 00000150         
+  136 00000150 E1A0B487        MOV              r11, r7, LSL#9
+  137 00000154 E1A0B4AB        MOV              r11, r11, LSR#9
+  138 00000158         
+  139 00000158 E158000A        CMP              r8, r10
+  140 0000015C B5806000        STRLT            r6, [r0]    ;if r8 > r10, swap 
+                                                            two nums
+  141 00000160 B580A004        STRLT            r10, [r0,#4]
+  142 00000164 BAFFFFF0        BLT              p_sort_loop
+  143 00000168 0159000B        CMPEQ            r9, r11
+  144 0000016C B5806000        STRLT            r6, [r0]
+  145 00000170 B580A004        STRLT            r10, [r0,#4]
+  146 00000174 BAFFFFEC        BLT              p_sort_loop
+  147 00000178         
+  148 00000178 E2822001        ADD              r2, r2, #1
+  149 0000017C EAFFFFE4        B                p_sort
+  150 00000180         
+
+
+
+ARM Macro Assembler    Page 4 
+
+
+  151 00000180         is_sort
+  152 00000180 E59F004C        LDR              r0, =n_nums_series
+  153 00000184 E59F104C        LDR              r1, =p_nums_series
+  154 00000188 E59F204C        LDR              r2, =final_result_series
+  155 0000018C         
+  156 0000018C E3A03000        MOV              r3, #0
+  157 00000190 EAFFFFFF        B                is_sort_loop_n
+  158 00000194         
+  159 00000194         is_sort_loop_n
+  160 00000194 E1530004        CMP              r3, r4
+  161 00000198 03A03000        MOVEQ            r3, #0
+  162 0000019C 0A000003        BEQ              is_sort_loop_p
+  163 000001A0         
+  164 000001A0 E4906004        LDR              r6,[r0],#4
+  165 000001A4 E4826004        STR              r6,[r2],#4
+  166 000001A8 E2833001        ADD              r3, r3, #1
+  167 000001AC EAFFFFF8        B                is_sort_loop_n
+  168 000001B0         
+  169 000001B0         is_sort_loop_p
+  170 000001B0 E1530005        CMP              r3, r5
+  171 000001B4 0A000003        BEQ              exit
+  172 000001B8         
+  173 000001B8 E4916004        LDR              r6,[r1],#4
+  174 000001BC E4826004        STR              r6,[r2],#4
+  175 000001C0 E2833001        ADD              r3, r3, #1
+  176 000001C4 EAFFFFF2        B                is_sort_loop_n
+  177 000001C8         
+  178 000001C8         exit
+  179 000001C8                 END
+              DEADBEEF 
+              00002710 
+              0EACBA90 
+              0003D090 
+              000493E0 
+              00031190 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=ARM9E --apcs=interwork 
+--depend=.\objects\source_1.d -o.\objects\source_1.o -IC:\Keil_v5\ARM\RV31\INC 
+-IC:\Keil_v5\ARM\CMSIS\Include --predefine="__EVAL SETA 1" --predefine="__UVISI
+ON_VERSION SETA 529" --list=.\listings\source_1.lst source_1.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+code_area 00000000
+
+Symbol: code_area
+   Definitions
+      At line 1 in file source_1.s
+   Uses
+      None
+Comment: code_area unused
+exit 000001C8
+
+Symbol: exit
+   Definitions
+      At line 178 in file source_1.s
+   Uses
+      At line 171 in file source_1.s
+Comment: exit used once
+initialization 00000000
+
+Symbol: initialization
+   Definitions
+      At line 13 in file source_1.s
+   Uses
+      None
+Comment: initialization unused
+is_sort 00000180
+
+Symbol: is_sort
+   Definitions
+      At line 151 in file source_1.s
+   Uses
+      At line 116 in file source_1.s
+Comment: is_sort used once
+is_sort_loop_n 00000194
+
+Symbol: is_sort_loop_n
+   Definitions
+      At line 159 in file source_1.s
+   Uses
+      At line 157 in file source_1.s
+      At line 167 in file source_1.s
+      At line 176 in file source_1.s
+
+is_sort_loop_p 000001B0
+
+Symbol: is_sort_loop_p
+   Definitions
+      At line 169 in file source_1.s
+   Uses
+      At line 162 in file source_1.s
+Comment: is_sort_loop_p used once
+ldr_ms 00000074
+
+Symbol: ldr_ms
+   Definitions
+      At line 59 in file source_1.s
+   Uses
+      At line 57 in file source_1.s
+      At line 74 in file source_1.s
+
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Relocatable symbols
+
+ms_init 00000058
+
+Symbol: ms_init
+   Definitions
+      At line 49 in file source_1.s
+   Uses
+      At line 21 in file source_1.s
+Comment: ms_init used once
+n_sort 000000A4
+
+Symbol: n_sort
+   Definitions
+      At line 76 in file source_1.s
+   Uses
+      At line 62 in file source_1.s
+      At line 112 in file source_1.s
+
+n_sort_loop 000000C0
+
+Symbol: n_sort_loop
+   Definitions
+      At line 85 in file source_1.s
+   Uses
+      At line 83 in file source_1.s
+      At line 105 in file source_1.s
+      At line 109 in file source_1.s
+
+p_sort 00000114
+
+Symbol: p_sort
+   Definitions
+      At line 114 in file source_1.s
+   Uses
+      At line 79 in file source_1.s
+      At line 149 in file source_1.s
+
+p_sort_loop 0000012C
+
+Symbol: p_sort_loop
+   Definitions
+      At line 122 in file source_1.s
+   Uses
+      At line 120 in file source_1.s
+      At line 142 in file source_1.s
+      At line 146 in file source_1.s
+
+random_float_number 0000002C
+
+Symbol: random_float_number
+   Definitions
+      At line 28 in file source_1.s
+   Uses
+      At line 22 in file source_1.s
+Comment: random_float_number used once
+save_float_series 00000010
+
+Symbol: save_float_series
+   Definitions
+      At line 19 in file source_1.s
+
+
+
+ARM Macro Assembler    Page 3 Alphabetic symbol ordering
+Relocatable symbols
+
+   Uses
+      At line 26 in file source_1.s
+Comment: save_float_series used once
+shift_left 00000048
+
+Symbol: shift_left
+   Definitions
+      At line 37 in file source_1.s
+   Uses
+      At line 33 in file source_1.s
+Comment: shift_left used once
+shift_right 00000050
+
+Symbol: shift_right
+   Definitions
+      At line 41 in file source_1.s
+   Uses
+      At line 34 in file source_1.s
+Comment: shift_right used once
+16 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Absolute symbols
+
+final_result_series 00031190
+
+Symbol: final_result_series
+   Definitions
+      At line 6 in file source_1.s
+   Uses
+      At line 154 in file source_1.s
+Comment: final_result_series used once
+float_number_series 00000450
+
+Symbol: float_number_series
+   Definitions
+      At line 4 in file source_1.s
+   Uses
+      At line 15 in file source_1.s
+      At line 50 in file source_1.s
+
+n_nums_series 0003D090
+
+Symbol: n_nums_series
+   Definitions
+      At line 8 in file source_1.s
+   Uses
+      At line 51 in file source_1.s
+      At line 80 in file source_1.s
+      At line 152 in file source_1.s
+
+p_nums_series 000493E0
+
+Symbol: p_nums_series
+   Definitions
+      At line 9 in file source_1.s
+   Uses
+      At line 52 in file source_1.s
+      At line 117 in file source_1.s
+      At line 153 in file source_1.s
+
+sorted_number_series 00018AEC
+
+Symbol: sorted_number_series
+   Definitions
+      At line 5 in file source_1.s
+   Uses
+      None
+Comment: sorted_number_series unused
+5 symbols
+355 symbols in table
