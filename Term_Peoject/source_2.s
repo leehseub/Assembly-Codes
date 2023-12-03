@@ -68,40 +68,28 @@ sort_loop
 	LDR r2, [r0]    ;r2 : key
 
     MOV r4, r2, LSR#31  ;sign bit
-
-	MOV r5, r2, LSL#1
-	MOV r5, r5, LSR#24  ;exponent
-	
-	MOV r6, r2, LSL#9
-	MOV r6, r6, LSR#9   ;fraction
 	
 	SUB r0, r0, #4
 	LDR r3, [r0]
-	
-    MOV r7, r3, LSR#31  ;sign bit
 
-	MOV r8, r3, LSL#1
-	MOV r8, r8, LSR#24  ;exponent
-	
-	MOV r9, r3, LSL#9
-	MOV r9, r9, LSR#9   ;fraction
-	
-	CMP r4, r7          
+    MOV r5, r3, LSR#31  ;sign bit
+
+	CMP r4, r5          
     ;compare sign bit
     ;GT : r2 = 1 & r3 = 0 (r2 is neg num & r3 is pos num)
     ;LT : r2 = 0 & r3 = 1 (r2 is pos num & r3 is neg num)
 	STRGT r2, [r0]		;if key value is lower than target swap two values
-	CMP r4, r7
+	CMP r4, r5
 	STRGT r3, [r0,#4]
-	CMP r4, r7
+	CMP r4, r5
 	SUBGT r12, r12, #1
-	CMP r4, r7
+	CMP r4, r5
 	BGT	sort_loop
-	CMP r4, r7
+	CMP r4, r5
 	SUBLT r11, r11, #1
-	CMP r4, r7
+	CMP r4, r5
     ADDLT r1, r1, #1
-	CMP r4, r7
+	CMP r4, r5
 	BLT sorting          ;if key value is higher than target, escape loop & compare next key
 
     ;if both are negative
@@ -114,32 +102,44 @@ sort_loop
 	
 ;exponent compare function of two negative numbers
 n_sort_exp
-	CMP r5, r8          ;compare exponent
+	MOV r4, r2, LSL#1
+	MOV r4, r4, LSR#24  ;exponent
+	
+	MOV r5, r3, LSL#1
+	MOV r5, r5, LSR#24  ;exponent
+	
+	CMP r4, r5          ;compare exponent
     STRGT r2, [r0]      ;if r2 has bigger exponent, swap them
-	CMP r5, r8
+	CMP r4, r5
     STRGT r3, [r0,#4]
-	CMP r5, r8
+	CMP r4, r5
 	SUBGT r12, r12, #1
-	CMP r5, r8
+	CMP r4, r5
     BGT sort_loop
-	CMP r5, r8
+	CMP r4, r5
 	SUBLT r11, r11, #1
-	CMP r5, r8
+	CMP r4, r5
     ADDLT r1, r1, #1    ;if r3 has bigger exponent, sort next key
-	CMP r5, r8
+	CMP r4, r5
     BLT sorting
-	CMP r5, r8
+	CMP r4, r5
     BEQ n_sort_frac     ;if exponents are same, then compare fraction
 
 ;fraction compare function of two negative numbers
 n_sort_frac
-    CMP r6, r9
+	MOV r4, r2, LSL#9
+	MOV r4, r4, LSR#9   ;fraction
+	
+	MOV r5, r3, LSL#9
+	MOV r5, r5, LSR#9   ;fraction
+	
+    CMP r4, r5
     STRGT r2, [r0]      ;if r2 is greater, swap them
-	CMP r6, r9
+	CMP r4, r5
     STRGT r3, [r0],#4
-	CMP r6, r9
+	CMP r4, r5
 	SUBGT r12, r12, #1
-	CMP r6, r9
+	CMP r4, r5
     BGT sort_loop
 	SUB r11, r11, #1
     ADD r1, r1, #1    ;if r3 is greater or Equal, sort next key
@@ -147,32 +147,44 @@ n_sort_frac
 
 ;exponent compare function of two positive numbers
 p_sort_exp
-	CMP r5, r8          ;compare exponent
+	MOV r4, r2, LSL#1
+	MOV r4, r4, LSR#24  ;exponent
+	
+	MOV r5, r3, LSL#1
+	MOV r5, r5, LSR#24  ;exponent
+	
+	CMP r4, r5          ;compare exponent
     STRLT r2, [r0]      ;if exponent of r3 is greater, swap them
-	CMP r5, r8
+	CMP r4, r5
     STRLT r3, [r0, #4]
-	CMP r5, r8
+	CMP r4, r5
 	SUBLT r12, r12, #1
-	CMP r5, r8
+	CMP r4, r5
     BLT sort_loop    
-	CMP r5, r8
+	CMP r4, r5
 	SUBGT r11, r11, #1
-	CMP r5, r8
+	CMP r4, r5
     ADDGT r1, r1, #1    ;if exponent of r2 is greater, sort next key
-	CMP r5, r8
+	CMP r4, r5
     BGT sorting
-	CMP r5, r8
+	CMP r4, r5
     BEQ p_sort_frac     ;if two exponents are same, compare fraction
 
 ;fraction compare function of two positive numbers
 p_sort_frac
-    CMP r6, r9
+	MOV r4, r2, LSL#9
+	MOV r4, r4, LSR#9   ;fraction
+	
+	MOV r5, r3, LSL#9
+	MOV r5, r5, LSR#9   ;fraction
+	
+    CMP r4, r5
     STRLT r2, [r0]      ;if fraction of r3 is greater than r3, swap
-	CMP r6, r9
+	CMP r4, r5
     STRLT r3, [r0,#4]
-	CMP r6, r9
+	CMP r4, r5
 	SUBLT r12, r12, #1
-	CMP r6, r9
+	CMP r4, r5
     BLT sort_loop
 	SUB r11, r11, #1
     ADD r1, r1, #1    ;if fraction of r2 is greater than or Equal to r2, sort next key

@@ -2,9 +2,9 @@
 		ENTRY
 
 float_number_series EQU 0x0450
-sorted_number_series EQU 0x00018AEC
-final_result_series EQU 0x00031190
-	
+sorted_number_series EQU 0x00018AEC	;101100
+final_result_series EQU 0x00031190	;201104
+
 ;========== Do not change this area ===========
 
 initialization
@@ -15,7 +15,7 @@ initialization
 
 save_float_series
 	CMP r2, #0
-	BEQ ms_init
+	BEQ is_init
 	BL random_float_number
 	STR r0, [r1], #4
 	SUB r2, r2, #1
@@ -25,7 +25,7 @@ save_float_series
 random_float_number
 	MOV r5, LR
 	EOR r0, r0, r3
-	EOR r3, r0, r3, ROR #2
+	EOR r3, r0, r3, ROR #2	; ex) 0000 1011 -> 1100 0010
 	CMP r0, r1
 	BLGE shift_left
 	BLLT shift_right
@@ -43,9 +43,175 @@ shift_right
 
 ;========== Start your code here ===========
 	
-ms_init
+is_init
+	MOV r1, #1
+	LDR r8, =10000
+	LDR r9, =0
+	LDR r11, =10000
+	B   sorting
 	
+sorting
+	LDR r0, =float_number_series
+    MOV r10, r1,LSL#2
+	MOV r12, r1
+    ADD r0, r0, r10
+    CMP r11, #0
+    BNE sort_loop
+	CMP r11, #0
+    BEQ is_str
+
+sort_loop
+	CMP r12, #0
+	ADDEQ r1, r1, #1
 	
+	CMP r12, #0
+	BEQ sorting
+	
+	LDR r2, [r0]    ;r2 : key
+
+    MOV r4, r2, LSR#31  ;sign bit
+	
+	SUB r0, r0, #4
+	LDR r3, [r0]
+	
+    MOV r5, r3, LSR#31  ;sign bit
+	
+	CMP r4, r5
+    ;compare sign bit
+    ;GT : r2 = 1 & r3 = 0 (r2 is neg num & r3 is pos num)
+    ;LT : r2 = 0 & r3 = 1 (r2 is pos num & r3 is neg num)
+	STRGT r2, [r0]		;if key value is lower than target swap two values
+	
+	CMP r4, r5
+	STRGT r3, [r0,#4]
+	
+	CMP r4, r5
+	SUBGT r12, r12, #1
+	
+	CMP r4, r5
+	BGT	sort_loop
+	
+	CMP r4, r5
+	SUBLT r11, r11, #1
+	
+	CMP r4, r5
+    ADDLT r1, r1, #1
+	
+	CMP r4, r5
+	BLT sorting          ;if key value is higher than target, escape loop & compare next key
+
+    ;if both are negative
+    CMP r4,#1
+    BEQ n_sort_exp
+
+    ;if both are positive
+    CMP r4,#0
+    BEQ p_sort_exp
+	
+;exponent compare function of two negative numbers
+n_sort_exp
+	MOV r4, r2, LSL#1
+	MOV r4, r4, LSR#24  ;exponent
+	
+	MOV r5, r3, LSL#1
+	MOV r5, r5, LSR#24  ;exponent
+	
+	CMP r4, r5          ;compare exponent
+    STRGT r2, [r0]      ;if r2 has bigger exponent, swap them
+	CMP r4, r5
+    STRGT r3, [r0,#4]
+	CMP r4, r5
+	SUBGT r12, r12, #1
+	CMP r4, r5
+    BGT sort_loop
+	CMP r4, r5
+	SUBLT r11, r11, #1
+	CMP r4, r5
+    ADDLT r1, r1, #1    ;if r3 has bigger exponent, sort next key
+	CMP r4, r5
+    BLT sorting
+	CMP r4, r5
+    BEQ n_sort_frac     ;if exponents are same, then compare fraction
+
+;fraction compare function of two negative numbers
+n_sort_frac
+	MOV r4, r2, LSL#9
+	MOV r4, r4, LSR#9   ;fraction
+	
+	MOV r5, r3, LSL#9
+	MOV r5, r5, LSR#9   ;fraction
+	
+    CMP r4, r5
+    STRGT r2, [r0]      ;if r2 is greater, swap them
+	CMP r4, r5
+    STRGT r3, [r0],#4
+	CMP r4, r5
+	SUBGT r12, r12, #1
+	CMP r4, r5
+    BGT sort_loop
+	SUB r11, r11, #1
+    ADD r1, r1, #1    ;if r3 is greater or Equal, sort next key
+    B sorting
+
+;exponent compare function of two positive numbers
+p_sort_exp
+	MOV r4, r2, LSL#1
+	MOV r4, r4, LSR#24  ;exponent
+	
+	MOV r5, r3, LSL#1
+	MOV r5, r5, LSR#24  ;exponent
+	
+	CMP r4, r5          ;compare exponent
+    STRLT r2, [r0]      ;if exponent of r3 is greater, swap them
+	CMP r4, r5
+    STRLT r3, [r0, #4]
+	CMP r4, r5
+	SUBLT r12, r12, #1
+	CMP r4, r5
+    BLT sort_loop    
+	CMP r4, r5
+	SUBGT r11, r11, #1
+	CMP r4, r5
+    ADDGT r1, r1, #1    ;if exponent of r2 is greater, sort next key
+	CMP r4, r5
+    BGT sorting
+	CMP r4, r5
+    BEQ p_sort_frac     ;if two exponents are same, compare fraction
+
+;fraction compare function of two positive numbers
+p_sort_frac
+	MOV r4, r2, LSL#9
+	MOV r4, r4, LSR#9   ;fraction
+	MOV r5, r3, LSL#9
+	MOV r5, r5, LSR#9   ;fraction
+	
+    CMP r4, r5
+    STRLT r2, [r0]      ;if fraction of r3 is greater than r3, swap
+	CMP r4, r5
+    STRLT r3, [r0,#4]
+	CMP r4, r5
+	SUBLT r12, r12, #1
+	CMP r4, r5
+    BLT sort_loop
+	SUB r11, r11, #1
+    ADD r1, r1, #1    ;if fraction of r2 is greater than or Equal to r2, sort next key
+    B sorting
+
+is_str
+    LDR r0, =float_number_series
+    LDR r1, =final_result_series
+    LDR r2, =10000
+    B is_str_loop
+
+is_str_loop
+    CMP r2, #0
+    BEQ exit
+
+    LDR r3, [r0], #4
+    STR r3, [r1], #4
+    SUB r2, r2, #1
+    B is_str_loop
+
 exit
 	END
 
